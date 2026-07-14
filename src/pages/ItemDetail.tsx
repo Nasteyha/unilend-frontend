@@ -10,6 +10,7 @@ interface Item {
   status: string
   owner_id: string
   max_borrow_days: number
+  image_url: string | null
 }
 
 const riskStyles: Record<string, string> = {
@@ -106,38 +107,69 @@ function ItemDetail() {
       <div className="max-w-2xl mx-auto">
         <Link to="/browse" className="text-sm text-slate-500 hover:text-violet-900">← Back to browse</Link>
 
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 mt-4">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">{item.category}</span>
-            <span className={`text-xs font-semibold border rounded-full px-2.5 py-0.5 ${riskStyles[item.risk_level]}`}>
-              {item.risk_level} risk
-            </span>
-          </div>
-
-          <h1 className="text-2xl font-extrabold text-slate-900 mb-2">{item.title}</h1>
-          <p className="text-slate-600 mb-4">{item.description}</p>
-          <p className="text-sm text-slate-400 mb-6">Can be borrowed for up to {item.max_borrow_days} days</p>
-
-          <div className="border-t border-slate-100 pt-6">
-            <h2 className="font-semibold text-slate-900 mb-3">Request to borrow</h2>
-
-            <label className="block text-sm font-medium text-slate-700 mb-1">Return date</label>
-            <input
-              type="date"
-              value={returnDate}
-              onChange={(e) => setReturnDate(e.target.value)}
-              className="w-full border border-slate-300 rounded-xl px-4 py-2.5 mb-4 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent"
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mt-4">
+          {item.image_url ? (
+            <img
+              src={item.image_url}
+              alt={item.title}
+              className="w-full h-72 object-cover"
             />
+          ) : (
+            <div className="w-full h-48 bg-gradient-to-br from-violet-50 to-amber-50 flex items-center justify-center">
+              <svg
+                className="w-14 h-14 text-violet-200"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.5}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+            </div>
+          )}
 
-            {message && <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-xl px-3 py-2 mb-4">{message}</p>}
-            {error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2 mb-4">{error}</p>}
+          <div className="p-8">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">{item.category}</span>
+              <span className={`text-xs font-semibold border rounded-full px-2.5 py-0.5 ${riskStyles[item.risk_level]}`}>
+                {item.risk_level} risk
+              </span>
+            </div>
 
-            <button
-              onClick={handleRequest}
-              className="w-full bg-violet-900 text-white font-semibold rounded-full py-3 shadow-lg hover:bg-violet-950 transition"
-            >
-              Send borrow request
-            </button>
+            <h1 className="text-2xl font-extrabold text-slate-900 mb-2">{item.title}</h1>
+            <p className="text-slate-600 mb-4">{item.description}</p>
+            <p className="text-sm text-slate-400 mb-6">Can be borrowed for up to {item.max_borrow_days} days</p>
+
+            <div className="border-t border-slate-100 pt-6">
+              <h2 className="font-semibold text-slate-900 mb-3">Request to borrow</h2>
+
+              <label className="block text-sm font-medium text-slate-700 mb-1">Return date</label>
+              <input
+                type="date"
+                value={returnDate}
+                onChange={(e) => setReturnDate(e.target.value)}
+                className="w-full border border-slate-300 rounded-xl px-4 py-2.5 mb-4 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent"
+              />
+
+              {message && <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-xl px-3 py-2 mb-4">{message}</p>}
+              {error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2 mb-4">{error}</p>}
+
+              <button
+                onClick={handleRequest}
+                className="w-full bg-violet-900 text-white font-semibold rounded-full py-3 shadow-lg hover:bg-violet-950 transition"
+              >
+                Send borrow request
+              </button>
+            </div>
           </div>
         </div>
       </div>

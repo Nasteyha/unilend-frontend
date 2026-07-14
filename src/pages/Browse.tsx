@@ -10,6 +10,7 @@ interface Item {
   status: string
   owner_id: string
   max_borrow_days: number
+  image_url: string | null
 }
 
 const riskStyles: Record<string, string> = {
@@ -60,24 +61,57 @@ function Browse() {
               <Link
                 key={item.id}
                 to={`/items/${item.id}`}
-                className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:shadow-md hover:border-violet-200 transition"
+                className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md hover:border-violet-200 hover:-translate-y-0.5 transition"
               >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
-                    {item.category}
-                  </span>
-                  <span className={`text-xs font-semibold border rounded-full px-2.5 py-0.5 ${riskStyles[item.risk_level]}`}>
-                    {item.risk_level} risk
-                  </span>
+                {item.image_url ? (
+                  <img
+                    src={item.image_url}
+                    alt={item.title}
+                    className="w-full h-40 object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-40 bg-gradient-to-br from-violet-50 to-amber-50 flex items-center justify-center">
+                    <svg
+                      className="w-10 h-10 text-violet-200"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={1.5}
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                    </svg>
+                  </div>
+                )}
+
+                <div className="p-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                      {item.category}
+                    </span>
+                    <span
+                      className={`text-xs font-semibold border rounded-full px-2.5 py-0.5 ${riskStyles[item.risk_level]}`}
+                    >
+                      {item.risk_level} risk
+                    </span>
+                  </div>
+                  <h3 className="font-bold text-slate-900 mb-1">{item.title}</h3>
+                  <p className="text-sm text-slate-500 line-clamp-2 mb-3">{item.description}</p>
+                  <p className="text-xs text-slate-400">Up to {item.max_borrow_days} days</p>
                 </div>
-                <h3 className="font-bold text-slate-900 mb-1">{item.title}</h3>
-                <p className="text-sm text-slate-500 line-clamp-2 mb-3">{item.description}</p>
-                <p className="text-xs text-slate-400">Up to {item.max_borrow_days} days</p>
               </Link>
             ))}
           </div>
         )}
-      </div>
+          </div>
     </div>
   )
 }
