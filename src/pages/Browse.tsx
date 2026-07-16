@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
+import Navbar from "../components/Navbar"
 
 interface Item {
   id: string
@@ -42,6 +43,7 @@ function Browse() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 via-violet-50 to-white px-6 py-10">
+      <Navbar/>
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Browse items</h1>

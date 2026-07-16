@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
-
+import Navbar from "../components/Navbar"
 interface MyRequest {
   id: string
   status: "pending" | "approved" | "rejected" | "returned"
@@ -51,6 +51,7 @@ function MyRequests() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 via-violet-50 to-white px-6 py-10">
+      <Navbar/>
       <div className="max-w-3xl mx-auto">
         <Link to="/browse" className="text-sm text-slate-500 hover:text-violet-900">← Back to browse</Link>
         <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 mt-4 mb-8">My requests</h1>

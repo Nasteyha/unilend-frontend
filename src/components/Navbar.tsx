@@ -11,6 +11,7 @@ const links = [
 function Navbar() {
   const navigate = useNavigate()
   const [isAdmin, setIsAdmin] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     const token = localStorage.getItem("token")
@@ -37,43 +38,39 @@ function Navbar() {
     navigate("/login")
   }
 
+  const linkClasses = ({ isActive }: { isActive: boolean }) =>
+    `px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition ${
+      isActive
+        ? "bg-violet-100 text-violet-800"
+        : "text-slate-600 hover:text-violet-800 hover:bg-violet-50"
+    }`
+
+  const adminClasses = ({ isActive }: { isActive: boolean }) =>
+    `px-3 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition ${
+      isActive
+        ? "bg-amber-100 text-amber-800"
+        : "text-amber-700 hover:text-amber-800 hover:bg-amber-50"
+    }`
+
   return (
     <header className="bg-white/80 backdrop-blur border-b border-slate-100 sticky top-0 z-10">
       <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between gap-6">
         <Link
           to="/dashboard"
-          className="text-xl font-extrabold bg-gradient-to-r from-amber-500 to-violet-700 bg-clip-text text-transparent shrink-0"
+        className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-amber-500 to-violet-700 bg-clip-text text-transparent shrink-0"
         >
           UniLend
         </Link>
 
-        <nav className="flex items-center gap-1 overflow-x-auto">
+        {/* desktop links: hidden on phones, visible from md up */}
+        <nav className="hidden md:flex items-center gap-1">
           {links.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              className={({ isActive }) =>
-                `px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition ${
-                  isActive
-                    ? "bg-violet-100 text-violet-800"
-                    : "text-slate-600 hover:text-violet-800 hover:bg-violet-50"
-                }`
-              }
-            >
+            <NavLink key={link.to} to={link.to} className={linkClasses}>
               {link.label}
             </NavLink>
           ))}
           {isAdmin && (
-            <NavLink
-              to="/admin"
-              className={({ isActive }) =>
-                `px-3 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition ${
-                  isActive
-                    ? "bg-amber-100 text-amber-800"
-                    : "text-amber-700 hover:text-amber-800 hover:bg-amber-50"
-                }`
-              }
-            >
+            <NavLink to="/admin" className={adminClasses}>
               Admin
             </NavLink>
           )}
@@ -81,11 +78,59 @@ function Navbar() {
 
         <button
           onClick={handleLogout}
-          className="text-sm font-medium text-slate-500 hover:text-violet-700 transition shrink-0"
+          className="hidden md:block text-sm font-medium text-slate-500 hover:text-violet-700 transition shrink-0"
         >
           Log out
         </button>
+
+        {/* hamburger: visible on phones, hidden from md up */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-violet-50"
+          aria-label="Toggle menu"
+        >
+          {menuOpen ? (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          )}
+        </button>
       </div>
+
+      {/* mobile dropdown panel */}
+      {menuOpen && (
+        <nav className="md:hidden border-t border-slate-100 bg-white/95 backdrop-blur px-6 py-3 flex flex-col gap-1">
+          {links.map((link) => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              className={linkClasses}
+              onClick={() => setMenuOpen(false)}
+            >
+              {link.label}
+            </NavLink>
+          ))}
+          {isAdmin && (
+            <NavLink
+              to="/admin"
+              className={adminClasses}
+              onClick={() => setMenuOpen(false)}
+            >
+              Admin
+            </NavLink>
+          )}
+          <button
+            onClick={handleLogout}
+            className="text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition"
+          >
+            Log out
+          </button>
+        </nav>
+      )}
     </header>
   )
 }

@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
-
+import Navbar from "../components/Navbar"
 function CreateListing() {
   const navigate = useNavigate()
 
@@ -98,6 +98,7 @@ function CreateListing() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 via-violet-50 to-white px-6 py-10">
+      <Navbar/>
       <div className="max-w-lg mx-auto">
         <Link to="/browse" className="text-sm text-slate-500 hover:text-violet-900">
           ← Back to browse
