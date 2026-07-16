@@ -74,6 +74,7 @@ function Dashboard() {
     async function fetchUser() {
       try {
         const response = await fetch("http://localhost:8000/auth/me", {
+          cache: "no-store",
           headers: { Authorization: `Bearer ${token}` },
         })
 
@@ -93,6 +94,7 @@ function Dashboard() {
     async function fetchStats() {
       try {
         const response = await fetch("http://localhost:8000/dashboard/stats", {
+          cache: "no-store",
           headers: { Authorization: `Bearer ${token}` },
         })
 

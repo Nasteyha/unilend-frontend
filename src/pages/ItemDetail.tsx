@@ -32,7 +32,9 @@ function ItemDetail() {
   useEffect(() => {
     async function fetchItem() {
       try {
-        const response = await fetch(`http://localhost:8000/items/${id}`)
+        const response = await fetch(`http://localhost:8000/items/${id}`,{
+          cache: "no-store" ,
+        })
         if (!response.ok) {
           setItem(null)
           return

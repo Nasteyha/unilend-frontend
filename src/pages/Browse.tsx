@@ -26,7 +26,9 @@ function Browse() {
   useEffect(() => {
     async function fetchItems() {
       try {
-        const response = await fetch("http://localhost:8000/items/")
+        const response = await fetch("http://localhost:8000/items/", {
+          cache: "no-store",
+        })
         const data = await response.json()
         setItems(data)
       } catch {
