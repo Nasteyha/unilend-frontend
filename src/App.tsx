@@ -8,6 +8,7 @@ import ItemDetail from './pages/ItemDetail'
 import CreateListing from './pages/CreateListing'
 import ReceivedRequests from './pages/ReceivedRequests'
 import MyRequests from './pages/MyRequests'
+import AdminDashboard from './pages/AdminDashboard'
 function App() {
   return (
     <BrowserRouter>
@@ -21,6 +22,7 @@ function App() {
         <Route path="/create-listing" element={<CreateListing />} />
         <Route path="/received-requests" element={<ReceivedRequests />} />
         <Route path="/my-requests" element={<MyRequests />} />
+        <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
     </BrowserRouter>
   )

@@ -25,6 +25,24 @@ function Login() {
 
       const data = await response.json();
       localStorage.setItem("token", data.access_token);
+
+      // find out who just logged in, and send them to their home:
+      // admins land on the platform overview, everyone else on the dashboard
+      try {
+        const meResponse = await fetch("http://localhost:8000/auth/me", {
+          headers: { Authorization: `Bearer ${data.access_token}` },
+          cache: "no-store",
+        });
+
+        if (meResponse.ok) {
+          const me = await meResponse.json();
+          navigate(me.role === "admin" ? "/admin" : "/dashboard");
+          return;
+        }
+      } catch {
+        // role lookup failed: fall through to the default home
+      }
+
       navigate("/dashboard");
     } catch {
       setError("Could not reach the server. Is the backend running?");
@@ -100,7 +118,7 @@ function Login() {
 
         {/* footer link */}
         <p className="text-sm text-slate-600 mt-6 text-center">
-          Don’t have an account?{" "}
+          Don't have an account?{" "}
           <Link
             to="/register"
             className="font-semibold text-violet-900 hover:text-violet-950 hover:underline"

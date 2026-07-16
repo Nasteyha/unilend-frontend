@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react"
 import { Link, NavLink, useNavigate } from "react-router-dom"
 
 const links = [
@@ -9,6 +10,27 @@ const links = [
 
 function Navbar() {
   const navigate = useNavigate()
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  useEffect(() => {
+    const token = localStorage.getItem("token")
+    if (!token) return
+
+    async function fetchRole() {
+      try {
+        const response = await fetch("http://localhost:8000/auth/me", {
+          headers: { Authorization: `Bearer ${token}` },
+          cache: "no-store",
+        })
+        if (!response.ok) return
+        const data = await response.json()
+        setIsAdmin(data.role === "admin")
+      } catch {
+        // navbar works fine without role info
+      }
+    }
+    fetchRole()
+  }, [])
 
   function handleLogout() {
     localStorage.removeItem("token")
@@ -41,6 +63,20 @@ function Navbar() {
               {link.label}
             </NavLink>
           ))}
+          {isAdmin && (
+            <NavLink
+              to="/admin"
+              className={({ isActive }) =>
+                `px-3 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition ${
+                  isActive
+                    ? "bg-amber-100 text-amber-800"
+                    : "text-amber-700 hover:text-amber-800 hover:bg-amber-50"
+                }`
+              }
+            >
+              Admin
+            </NavLink>
+          )}
         </nav>
 
         <button
