@@ -12,6 +12,7 @@ interface PlatformStats {
   transactions_active: number
   returns_on_time: number
   returns_late: number
+  
 }
 
 interface AdminUser {
@@ -30,6 +31,7 @@ interface AdminTransaction {
   returned_at: string | null
   item_title: string
   borrower_name: string
+  return_note: string| null
 }
 
 const txStyles: Record<string, string> = {
@@ -151,6 +153,7 @@ function AdminDashboard() {
                       <th className="pb-2 pr-4 font-medium">Email</th>
                       <th className="pb-2 pr-4 font-medium">Role</th>
                       <th className="pb-2 font-medium">Trust score</th>
+                      
                     </tr>
                   </thead>
                   <tbody>
@@ -190,6 +193,7 @@ function AdminDashboard() {
                         <th className="pb-2 pr-4 font-medium">Borrower</th>
                         <th className="pb-2 pr-4 font-medium">Borrowed</th>
                         <th className="pb-2 pr-4 font-medium">Returned</th>
+                        <th className="pb-2 pr-4 font-medium">Note</th>
                         <th className="pb-2 font-medium">Status</th>
                       </tr>
                     </thead>
@@ -204,6 +208,7 @@ function AdminDashboard() {
                           <td className="py-2.5 pr-4 text-slate-600">
                             {t.returned_at ? new Date(t.returned_at).toLocaleDateString() : "—"}
                           </td>
+                          <td className="py-2.5 pr-4 text-slate-600">{t.return_note || "—"}</td>
                           <td className="py-2.5">
                             <span
                               className={`text-xs font-semibold border rounded-full px-2.5 py-0.5 ${txStyles[t.status]}`}

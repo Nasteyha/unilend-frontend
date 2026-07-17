@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react"
-import { useNavigate, Link } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import Navbar from "../components/Navbar"
 import { API_URL } from "../config"
+
 interface ReceivedRequest {
   id: string
   status: string
@@ -18,6 +19,7 @@ interface ReceivedRequest {
 function ReceivedRequests() {
   const navigate = useNavigate()
   const [requests, setRequests] = useState<ReceivedRequest[]>([])
+  const [notes, setNotes] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
 
   async function fetchRequests() {
@@ -56,14 +58,20 @@ function ReceivedRequests() {
     }
     try {
       const response = await fetch(
-         `${API_URL}/borrow-requests/${requestId}/${action}`,
+        `${API_URL}/borrow-requests/${requestId}/${action}`,
         {
           method: "PUT",
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body:
+            action === "return"
+              ? JSON.stringify({ return_note: notes[requestId] || null })
+              : undefined,
         }
       )
       if (response.ok) {
-        // refetch so the request moves to its new section (or disappears)
         await fetchRequests()
       }
     } catch {
@@ -78,13 +86,11 @@ function ReceivedRequests() {
     deadline ? new Date(deadline) < new Date() : false
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-violet-50 to-white px-6 py-10">
-      <Navbar/>
-      <div className="max-w-3xl mx-auto">
-        <Link to="/browse" className="text-sm text-slate-500 hover:text-violet-900">
-          ← Back to browse
-        </Link>
-        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 mt-4 mb-8">
+    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-violet-50 to-white">
+      <Navbar />
+
+      <div className="max-w-3xl mx-auto px-6 py-10">
+        <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 mb-8">
           Requests for your items
         </h1>
 
@@ -146,7 +152,7 @@ function ReceivedRequests() {
               <div className="space-y-4">
                 {borrowed.map((r) => (
                   <div key={r.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-                    <div className="flex items-start justify-between gap-4">
+                    <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
                       <div>
                         <div className="flex items-center gap-2">
                           <h3 className="font-bold text-slate-900">{r.item_title}</h3>
@@ -159,19 +165,36 @@ function ReceivedRequests() {
                         <p className="text-sm text-slate-600 mt-1">
                           Borrowed by <span className="font-medium">{r.borrower_name}</span>
                         </p>
+                        <p className="text-sm text-slate-500 mt-1">
+                          Contact:{" "}
+                          <a
+                            href={`mailto:${r.borrower_email}`}
+                            className="text-violet-700 hover:underline"
+                          >
+                            {r.borrower_email}
+                          </a>
+                        </p>
                         {r.return_deadline && (
                           <p className="text-sm text-slate-500 mt-1">
-                            Contact: <a href={`mailto:${r.borrower_email}`} className="text-violet-700 hover:underline">{r.borrower_email}</a>
                             Due back: {new Date(r.return_deadline).toLocaleDateString()}
                           </p>
                         )}
                       </div>
-                      <button
-                        onClick={() => handleAction(r.id, "return")}
-                        className="text-sm font-semibold bg-white text-violet-900 border border-violet-300 rounded-full px-5 py-2 hover:bg-violet-50 transition shrink-0"
-                      >
-                        Mark as returned
-                      </button>
+                      <div className="flex flex-col gap-2 shrink-0 w-full sm:w-56">
+                        <input
+                          type="text"
+                          value={notes[r.id] || ""}
+                          onChange={(e) => setNotes({ ...notes, [r.id]: e.target.value })}
+                          placeholder="Condition note (optional)"
+                          className="border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent"
+                        />
+                        <button
+                          onClick={() => handleAction(r.id, "return")}
+                          className="text-sm font-semibold bg-white text-violet-900 border border-violet-300 rounded-full px-4 py-2 hover:bg-violet-50 transition"
+                        >
+                          Mark as returned
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}

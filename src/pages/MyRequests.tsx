@@ -44,6 +44,10 @@ function MyRequests() {
         }
         const data = await response.json()
         setRequests(data)
+        localStorage.setItem(
+          "seenApprovedCount",
+           String(data.filter((r: MyRequest) => r.status === "approved").length)
+)
       } catch {
         setRequests([])
       } finally {

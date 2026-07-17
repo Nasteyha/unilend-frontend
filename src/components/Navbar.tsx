@@ -13,6 +13,8 @@ function Navbar() {
   const navigate = useNavigate()
   const [isAdmin, setIsAdmin] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [pendingCount, setPendingCount] = useState(0)
+  const [approvedCount, setApprovedCount] = useState(0)
 
   useEffect(() => {
     const token = localStorage.getItem("token")
@@ -31,7 +33,26 @@ function Navbar() {
         // navbar works fine without role info
       }
     }
+
+    async function fetchCounts() {
+      try {
+        const response = await fetch(`${API_URL}/dashboard/stats`, {
+          headers: { Authorization: `Bearer ${token}` },
+          cache: "no-store",
+        })
+        if (!response.ok) return
+        const data = await response.json()
+        setPendingCount(data.requests_received_pending)
+        const seen = Number(localStorage.getItem("seenApprovedCount") || 0)
+        setApprovedCount(Math.max(0, data.requests_approved - seen))
+      } catch {
+        // badges are decoration; navbar works without them
+      }
+      
+    }
+
     fetchRole()
+    fetchCounts()
   }, [])
 
   function handleLogout() {
@@ -53,6 +74,22 @@ function Navbar() {
         : "text-amber-700 hover:text-amber-800 hover:bg-amber-50"
     }`
 
+  const linkLabel = (link: { to: string; label: string }) => (
+    <span className="relative">
+      {link.label}
+      {link.to === "/received-requests" && pendingCount > 0 && (
+        <span className="absolute -top-1.5 -right-3 min-w-4 h-4 px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+          {pendingCount}
+        </span>
+      )}
+      {link.to === "/my-requests" && approvedCount > 0 && (
+        <span className="absolute -top-1.5 -right-3 min-w-4 h-4 px-1 bg-violet-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+          {approvedCount}
+        </span>
+      )}
+    </span>
+  )
+
   return (
     <header className="bg-white/80 backdrop-blur border-b border-slate-100 sticky top-0 z-10">
       <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between gap-6">
@@ -63,11 +100,11 @@ function Navbar() {
           UniLend
         </Link>
 
-        {/* desktop links: hidden on phones, visible from md up */}
+        {/* desktop links */}
         <nav className="nav-desktop items-center gap-1">
           {links.map((link) => (
             <NavLink key={link.to} to={link.to} className={linkClasses}>
-              {link.label}
+              {linkLabel(link)}
             </NavLink>
           ))}
           {isAdmin && (
@@ -84,7 +121,7 @@ function Navbar() {
           Log out
         </button>
 
-        {/* hamburger: visible on phones, hidden from md up */}
+        {/* hamburger */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
           className="nav-mobile-toggle p-2 rounded-lg text-slate-600 hover:bg-violet-50"
@@ -112,7 +149,7 @@ function Navbar() {
               className={linkClasses}
               onClick={() => setMenuOpen(false)}
             >
-              {link.label}
+              {linkLabel(link)}
             </NavLink>
           ))}
           {isAdmin && (
