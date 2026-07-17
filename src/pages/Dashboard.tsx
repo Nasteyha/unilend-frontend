@@ -12,7 +12,7 @@ import {
   LabelList,
 } from "recharts"
 import Navbar from "../components/Navbar"
-
+import { API_URL } from "../config"
 interface User {
   id: string
   full_name: string
@@ -73,7 +73,7 @@ function Dashboard() {
 
     async function fetchUser() {
       try {
-        const response = await fetch("http://localhost:8000/auth/me", {
+        const response = await fetch(`${API_URL}/auth/me`, {
           cache: "no-store",
           headers: { Authorization: `Bearer ${token}` },
         })
@@ -93,7 +93,7 @@ function Dashboard() {
 
     async function fetchStats() {
       try {
-        const response = await fetch("http://localhost:8000/dashboard/stats", {
+        const response = await fetch(`${API_URL}/dashboard/stats`, {
           cache: "no-store",
           headers: { Authorization: `Bearer ${token}` },
         })

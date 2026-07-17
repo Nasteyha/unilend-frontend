@@ -1,1 +1,10 @@
 @import "tailwindcss";
+@source "../src";
+@media (min-width: 768px) {
+  .nav-desktop { display: flex !important; }
+  .nav-mobile-toggle { display: none !important; }
+}
+@media (max-width: 767.98px) {
+  .nav-desktop { display: none !important; }
+  .nav-mobile-toggle { display: block !important; }
+}

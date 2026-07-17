@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import Navbar from "../components/Navbar"
+import { API_URL } from "../config"
 function CreateListing() {
   const navigate = useNavigate()
 
@@ -45,7 +46,7 @@ function CreateListing() {
         formData.append("file", photo)
 
         const uploadResponse = await fetch(
-          "http://localhost:8000/items/upload-image",
+          `${API_URL}/items/upload-image`,
           {
             method: "POST",
             headers: { Authorization: `Bearer ${token}` },
@@ -64,7 +65,7 @@ function CreateListing() {
       }
 
       // Step 2: create the item, including the image URL if we have one
-      const response = await fetch("http://localhost:8000/items/", {
+      const response = await fetch(`${API_URL}/items/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

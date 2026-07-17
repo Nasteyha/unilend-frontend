@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react"
 import { useNavigate, Link } from "react-router-dom"
-
+import { API_URL } from "../config"
 function Register() {
   const [fullName, setFullName] = useState("")
   const [email, setEmail] = useState("")
@@ -13,7 +13,7 @@ function Register() {
     setError("")
 
     try {
-      const response = await fetch("http://localhost:8000/auth/register", {
+      const response = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ full_name: fullName, email, password }),

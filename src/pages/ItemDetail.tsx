@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useParams, useNavigate, Link } from "react-router-dom"
 import Navbar from "../components/Navbar"
-
+import { API_URL } from "../config"
 interface Item {
   id: string
   title: string
@@ -33,7 +33,7 @@ function ItemDetail() {
   useEffect(() => {
     async function fetchItem() {
       try {
-        const response = await fetch(`http://localhost:8000/items/${id}`,{
+        const response = await fetch(`${API_URL}/items/${id}`,{
           cache: "no-store" ,
         })
         if (!response.ok) {
@@ -67,7 +67,7 @@ function ItemDetail() {
     }
 
     try {
-      const response = await fetch("http://localhost:8000/borrow-requests/", {
+      const response = await fetch(`${API_URL}/borrow-requests/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

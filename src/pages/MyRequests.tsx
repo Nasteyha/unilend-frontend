@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import Navbar from "../components/Navbar"
+import { API_URL } from "../config"
 interface MyRequest {
   id: string
   status: "pending" | "approved" | "rejected" | "returned"
@@ -30,7 +31,7 @@ function MyRequests() {
         return
       }
       try {
-        const response = await fetch("http://localhost:8000/borrow-requests/mine", {
+        const response = await fetch(`${API_URL}/borrow-requests/mine`, {
           headers: { Authorization: `Bearer ${token}` },
           cache: "no-store"
         })

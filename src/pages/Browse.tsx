@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import Navbar from "../components/Navbar"
+import { API_URL } from "../config"
 
 interface Item {
   id: string
@@ -27,7 +28,7 @@ function Browse() {
   useEffect(() => {
     async function fetchItems() {
       try {
-        const response = await fetch("http://localhost:8000/items/", {
+        const response = await fetch(`${API_URL}/items/`, {
           cache: "no-store",
         })
         const data = await response.json()

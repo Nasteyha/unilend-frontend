@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import Navbar from "../components/Navbar"
+import { API_URL } from "../config"
 interface ReceivedRequest {
   id: string
   status: string
@@ -25,7 +26,7 @@ function ReceivedRequests() {
       return
     }
     try {
-      const response = await fetch("http://localhost:8000/borrow-requests/received", {
+      const response = await fetch(`${API_URL}/borrow-requests/received`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: "no-store",
       })
@@ -54,7 +55,7 @@ function ReceivedRequests() {
     }
     try {
       const response = await fetch(
-        `http://localhost:8000/borrow-requests/${requestId}/${action}`,
+         `${API_URL}/borrow-requests/${requestId}/${action}`,
         {
           method: "PUT",
           headers: { Authorization: `Bearer ${token}` },

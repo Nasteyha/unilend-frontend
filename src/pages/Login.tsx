@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-
+import { API_URL } from "../config"
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -12,7 +12,7 @@ function Login() {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:8000/auth/login", {
+      const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -29,7 +29,7 @@ function Login() {
       // find out who just logged in, and send them to their home:
       // admins land on the platform overview, everyone else on the dashboard
       try {
-        const meResponse = await fetch("http://localhost:8000/auth/me", {
+        const meResponse = await fetch(`${API_URL}/auth/me`, {
           headers: { Authorization: `Bearer ${data.access_token}` },
           cache: "no-store",
         });

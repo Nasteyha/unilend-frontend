@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Navbar from "../components/Navbar"
-
+import { API_URL } from "../config"
 interface PlatformStats {
   total_users: number
   total_items: number
@@ -58,9 +58,9 @@ function AdminDashboard() {
     async function fetchAll() {
       try {
         const [statsRes, usersRes, txRes] = await Promise.all([
-          fetch("http://localhost:8000/admin/stats", { headers, cache: "no-store" }),
-          fetch("http://localhost:8000/admin/users", { headers, cache: "no-store" }),
-          fetch("http://localhost:8000/admin/transactions", { headers, cache: "no-store" }),
+           fetch(`${API_URL}/admin/stats`, { headers, cache: "no-store" }),
+           fetch(`${API_URL}/admin/users`, { headers, cache: "no-store" }),
+           fetch(`${API_URL}/admin/transactions`, { headers, cache: "no-store" }),
         ])
 
       if (statsRes.status === 403 || usersRes.status === 403 || txRes.status === 403) {          setForbidden(true)

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { Link, NavLink, useNavigate } from "react-router-dom"
+import { API_URL } from "../config"
 
 const links = [
   { to: "/browse", label: "Browse" },
@@ -19,7 +20,7 @@ function Navbar() {
 
     async function fetchRole() {
       try {
-        const response = await fetch("http://localhost:8000/auth/me", {
+        const response = await fetch(`${API_URL}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
           cache: "no-store",
         })
@@ -57,13 +58,13 @@ function Navbar() {
       <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between gap-6">
         <Link
           to="/dashboard"
-        className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-amber-500 to-violet-700 bg-clip-text text-transparent shrink-0"
+          className="text-xl font-extrabold bg-gradient-to-r from-amber-500 to-violet-700 bg-clip-text text-transparent shrink-0"
         >
           UniLend
         </Link>
 
         {/* desktop links: hidden on phones, visible from md up */}
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="nav-desktop items-center gap-1">
           {links.map((link) => (
             <NavLink key={link.to} to={link.to} className={linkClasses}>
               {link.label}
@@ -78,7 +79,7 @@ function Navbar() {
 
         <button
           onClick={handleLogout}
-          className="hidden md:block text-sm font-medium text-slate-500 hover:text-violet-700 transition shrink-0"
+          className="nav-desktop text-sm font-medium text-slate-500 hover:text-violet-700 transition shrink-0"
         >
           Log out
         </button>
@@ -86,7 +87,7 @@ function Navbar() {
         {/* hamburger: visible on phones, hidden from md up */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-violet-50"
+          className="nav-mobile-toggle p-2 rounded-lg text-slate-600 hover:bg-violet-50"
           aria-label="Toggle menu"
         >
           {menuOpen ? (
