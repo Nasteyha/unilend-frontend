@@ -12,6 +12,7 @@ interface ReceivedRequest {
   borrower_id: string
   borrower_name: string
   borrower_trust_score: number
+  borrower_email: string
 }
 
 function ReceivedRequests() {
@@ -160,6 +161,7 @@ function ReceivedRequests() {
                         </p>
                         {r.return_deadline && (
                           <p className="text-sm text-slate-500 mt-1">
+                            Contact: <a href={`mailto:${r.borrower_email}`} className="text-violet-700 hover:underline">{r.borrower_email}</a>
                             Due back: {new Date(r.return_deadline).toLocaleDateString()}
                           </p>
                         )}

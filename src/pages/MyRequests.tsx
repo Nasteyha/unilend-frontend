@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react"
-import { useNavigate, Link } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import Navbar from "../components/Navbar"
 import { API_URL } from "../config"
+
 interface MyRequest {
   id: string
   status: "pending" | "approved" | "rejected" | "returned"
@@ -9,6 +10,8 @@ interface MyRequest {
   return_deadline: string | null
   item_id: string
   item_title: string
+  lender_name: string
+  lender_email: string
 }
 
 const statusStyles: Record<string, string> = {
@@ -33,7 +36,7 @@ function MyRequests() {
       try {
         const response = await fetch(`${API_URL}/borrow-requests/mine`, {
           headers: { Authorization: `Bearer ${token}` },
-          cache: "no-store"
+          cache: "no-store",
         })
         if (!response.ok) {
           setRequests([])
@@ -51,11 +54,13 @@ function MyRequests() {
   }, [navigate])
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-violet-50 to-white px-6 py-10">
-      <Navbar/>
-      <div className="max-w-3xl mx-auto">
-        <Link to="/browse" className="text-sm text-slate-500 hover:text-violet-900">← Back to browse</Link>
-        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 mt-4 mb-8">My requests</h1>
+    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-violet-50 to-white">
+      <Navbar />
+
+      <div className="max-w-3xl mx-auto px-6 py-10">
+        <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 mb-8">
+          My requests
+        </h1>
 
         {loading ? (
           <p className="text-slate-500">Loading your requests...</p>
@@ -64,7 +69,10 @@ function MyRequests() {
         ) : (
           <div className="space-y-4">
             {requests.map((r) => (
-              <div key={r.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex items-center justify-between gap-4">
+              <div
+                key={r.id}
+                className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex items-start justify-between gap-4"
+              >
                 <div>
                   <h3 className="font-bold text-slate-900">{r.item_title}</h3>
                   {r.return_deadline && (
@@ -72,8 +80,23 @@ function MyRequests() {
                       Return by: {new Date(r.return_deadline).toLocaleDateString()}
                     </p>
                   )}
+                  {r.status === "approved" && (
+                    <p className="text-sm text-slate-600 mt-2 bg-violet-50 border border-violet-100 rounded-xl px-3 py-2">
+                      Approved! Contact{" "}
+                      <span className="font-semibold">{r.lender_name}</span> at{" "}
+                      <a
+                        href={`mailto:${r.lender_email}`}
+                        className="text-violet-700 font-medium hover:underline"
+                      >
+                        {r.lender_email}
+                      </a>{" "}
+                      to arrange pickup.
+                    </p>
+                  )}
                 </div>
-                <span className={`text-xs font-semibold border rounded-full px-3 py-1 capitalize ${statusStyles[r.status]}`}>
+                <span
+                  className={`text-xs font-semibold border rounded-full px-3 py-1 capitalize shrink-0 ${statusStyles[r.status]}`}
+                >
                   {r.status}
                 </span>
               </div>
