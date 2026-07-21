@@ -22,6 +22,7 @@ interface AdminUser {
   email: string
   role: string
   trust_score: number
+  average_rating: number | null
   created_at: string
 }
 
@@ -155,7 +156,8 @@ function AdminDashboard() {
                       <th className="pb-2 pr-4 font-medium">Email</th>
                       <th className="pb-2 pr-4 font-medium">Role</th>
                       <th className="pb-2 pr-4 font-medium">Trust score</th>
-                      <th className="pb-2 font-medium">Rating</th>
+                      <th className="pb-2 pr-4 font-medium">Rating</th>
+                      <th className="pb-2 font-medium">Avg. Lender Rating</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -175,8 +177,13 @@ function AdminDashboard() {
                           </span>
                         </td>
                         <td className="py-2.5 pr-4 font-semibold text-violet-800">{u.trust_score}</td>
-                        <td className="py-2.5">
+                        <td className="py-2.5 pr-4">
                           <StarRating score={u.trust_score} size="sm" />
+                        </td>
+                        <td className="py-2.5 text-slate-600">
+                          {u.average_rating !== null
+                            ? `${u.average_rating.toFixed(1)} ★`
+                            : "No ratings yet"}
                         </td>
                       </tr>
                     ))}
