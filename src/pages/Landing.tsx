@@ -1,28 +1,4 @@
 import { Link } from "react-router-dom";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
-  CartesianGrid,
-  Cell,
-  LabelList,
-} from "recharts";
-
-const DEMO_DATA = [
-  { name: "Items listed", value: 5 },
-  { name: "Requests sent", value: 3 },
-  { name: "Pending", value: 2 },
-  { name: "Approved", value: 4 },
-];
-
-const DEMO_GRADIENTS = [
-  { id: "demoAmber", from: "#fbbf24", to: "#f59e0b" },
-  { id: "demoLilac", from: "#c4b5fd", to: "#a78bfa" },
-  { id: "demoViolet", from: "#a78bfa", to: "#8b5cf6" },
-  { id: "demoDeep", from: "#8b5cf6", to: "#6d28d9" },
-];
 
 const chipStyles = [
   "bg-violet-100 text-violet-700",
@@ -71,8 +47,8 @@ const features = [
     ),
   },
   {
-      title: "Tracked lending lifecycle",
-      desc: "Every borrow is recorded from approval to return, with on-time and late returns shaping reputation.",
+    title: "Tracked lending lifecycle",
+    desc: "Every borrow is recorded from approval to return, with on-time and late returns shaping reputation.",
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -86,6 +62,39 @@ const features = [
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+    ),
+  },
+];
+
+const trustPanel = [
+  {
+    title: "Identity verification",
+    desc: "Only verified USIU-Africa emails are allowed on the platform.",
+    chip: "bg-violet-100 text-violet-700",
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+      </svg>
+    ),
+  },
+  {
+    title: "Trust system",
+    desc: "Users build reputation through successful lending activity.",
+    chip: "bg-amber-100 text-amber-700",
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg>
+    ),
+  },
+  {
+    title: "Risk protection",
+    desc: "High-value items require higher trust levels before approval.",
+    chip: "bg-indigo-100 text-indigo-700",
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
       </svg>
     ),
   },
@@ -168,84 +177,26 @@ function Landing() {
             </p>
           </div>
 
-          {/* RIGHT SIDE (DASHBOARD PREVIEW) */}
-          <div className="relative">
-            <div className="bg-white rounded-3xl border border-slate-200 shadow-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="font-bold text-slate-900">Your activity</h3>
-                  <p className="text-xs text-slate-500">
-                    What your dashboard looks like
-                  </p>
-                </div>
-                <span className="text-[10px] font-semibold uppercase tracking-wide bg-violet-100 text-violet-700 rounded-full px-3 py-1">
-                  Sample
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 mb-4">
-                <div className="bg-violet-50 rounded-xl p-3">
-                  <p className="text-2xl font-extrabold text-violet-800">5</p>
-                  <p className="text-xs text-slate-500">Items listed</p>
-                </div>
-                <div className="bg-amber-50 rounded-xl p-3">
-                  <p className="text-2xl font-extrabold text-amber-600">82</p>
-                  <p className="text-xs text-slate-500">Trust score</p>
+          {/* RIGHT SIDE (TRUST PANEL) */}
+          <div className="space-y-4">
+            {trustPanel.map((panel) => (
+              <div
+                key={panel.title}
+                className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition"
+              >
+                <div className="flex items-start gap-4">
+                  <div
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${panel.chip}`}
+                  >
+                    {panel.icon}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-1">{panel.title}</h3>
+                    <p className="text-sm text-slate-600">{panel.desc}</p>
+                  </div>
                 </div>
               </div>
-
-              <div className="h-48">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={DEMO_DATA} barSize={36}>
-                    <defs>
-                      {DEMO_GRADIENTS.map((g) => (
-                        <linearGradient
-                          key={g.id}
-                          id={g.id}
-                          x1="0"
-                          y1="0"
-                          x2="0"
-                          y2="1"
-                        >
-                          <stop offset="0%" stopColor={g.from} />
-                          <stop offset="100%" stopColor={g.to} />
-                        </linearGradient>
-                      ))}
-                    </defs>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      vertical={false}
-                      stroke="#e2e8f0"
-                    />
-                    <XAxis
-                      dataKey="name"
-                      tick={{ fontSize: 10, fill: "#64748b" }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <YAxis hide />
-                    <Bar dataKey="value" radius={[8, 8, 0, 0]}>
-                      <LabelList
-                        dataKey="value"
-                        position="top"
-                        style={{ fill: "#334155", fontSize: 11, fontWeight: 700 }}
-                      />
-                      {DEMO_DATA.map((entry, index) => (
-                        <Cell
-                          key={entry.name}
-                          fill={`url(#${DEMO_GRADIENTS[index].id})`}
-                        />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-
-              <p className="text-xs text-slate-500 mt-3">
-                List items, send borrow requests, and build your trust score —
-                all in one place.
-              </p>
-            </div>
+            ))}
           </div>
 
         </div>
