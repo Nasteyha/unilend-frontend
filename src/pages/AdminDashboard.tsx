@@ -1,5 +1,16 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  Cell,
+  LabelList,
+} from "recharts"
 import Navbar from "../components/Navbar"
 import StarRating from "../components/StarRating"
 import { API_URL } from "../config"
@@ -23,6 +34,7 @@ interface AdminUser {
   role: string
   trust_score: number
   average_rating: number | null
+  completed_loans: number
   created_at: string
 }
 
@@ -96,6 +108,30 @@ function AdminDashboard() {
     )
   }
 
+  // --- derived analytics, computed from the users list already fetched above ---
+
+  const sortedByTrust = [...users].sort((a, b) => b.trust_score - a.trust_score)
+
+  const chartData = sortedByTrust.map((u) => ({
+    name: u.full_name.split(" ")[0], // first name only, keeps bar labels short
+    score: u.trust_score,
+  }))
+
+  const topBorrower =
+    users.length > 0
+      ? users.reduce((top, u) => (u.completed_loans > (top?.completed_loans ?? -1) ? u : top), users[0])
+      : null
+
+  const ratedUsers = users.filter((u) => u.average_rating !== null)
+  const highestRated =
+    ratedUsers.length > 0
+      ? ratedUsers.reduce((best, u) => (u.average_rating! > best.average_rating! ? u : best))
+      : null
+  const lowestRated =
+    ratedUsers.length > 0
+      ? ratedUsers.reduce((worst, u) => (u.average_rating! < worst.average_rating! ? u : worst))
+      : null
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 via-violet-50 to-white">
       <Navbar />
@@ -146,7 +182,109 @@ function AdminDashboard() {
               </>
             )}
 
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mt-8">
+            {/* USER INSIGHTS: highlight cards + trust score distribution */}
+            {users.length > 0 && (
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mt-6">
+                <h2 className="font-bold text-slate-900 mb-1">User Insights</h2>
+                <p className="text-sm text-slate-500 mb-5">
+                  How trust and activity are distributed across the platform
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+                  <div className="bg-violet-50 rounded-xl p-4">
+                    <p className="text-xs font-semibold text-violet-700 uppercase tracking-wide mb-1">
+                      Top Borrower
+                    </p>
+                    {topBorrower && topBorrower.completed_loans > 0 ? (
+                      <>
+                        <p className="font-bold text-slate-900">{topBorrower.full_name}</p>
+                        <p className="text-sm text-slate-500">
+                          {topBorrower.completed_loans} completed loan
+                          {topBorrower.completed_loans === 1 ? "" : "s"}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-sm text-slate-500">No completed loans yet</p>
+                    )}
+                  </div>
+
+                  <div className="bg-green-50 rounded-xl p-4">
+                    <p className="text-xs font-semibold text-green-700 uppercase tracking-wide mb-1">
+                      Highest Rated
+                    </p>
+                    {highestRated ? (
+                      <>
+                        <p className="font-bold text-slate-900">{highestRated.full_name}</p>
+                        <StarRating score={highestRated.trust_score} size="sm" showValue={false} />
+                      </>
+                    ) : (
+                      <p className="text-sm text-slate-500">No ratings yet</p>
+                    )}
+                  </div>
+
+                  <div className="bg-red-50 rounded-xl p-4">
+                    <p className="text-xs font-semibold text-red-700 uppercase tracking-wide mb-1">
+                      Lowest Rated
+                    </p>
+                    {lowestRated ? (
+                      <>
+                        <p className="font-bold text-slate-900">{lowestRated.full_name}</p>
+                        <StarRating score={lowestRated.trust_score} size="sm" showValue={false} />
+                      </>
+                    ) : (
+                      <p className="text-sm text-slate-500">No ratings yet</p>
+                    )}
+                  </div>
+                </div>
+
+                <p className="text-xs text-slate-500 mb-2">Trust score by user, highest to lowest</p>
+                <div className="h-56">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData} barSize={36}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                      <XAxis
+                        dataKey="name"
+                        tick={{ fontSize: 11, fill: "#64748b" }}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+                      <YAxis
+                        domain={[0, 100]}
+                        tick={{ fontSize: 11, fill: "#64748b" }}
+                        axisLine={false}
+                        tickLine={false}
+                        width={28}
+                      />
+                      <Tooltip
+                        cursor={{ fill: "rgba(124, 58, 237, 0.06)" }}
+                        contentStyle={{ borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "13px" }}
+                      />
+                      <Bar dataKey="score" radius={[8, 8, 0, 0]}>
+                        <LabelList
+                          dataKey="score"
+                          position="top"
+                          style={{ fill: "#334155", fontSize: 11, fontWeight: 700 }}
+                        />
+                        {chartData.map((entry, index) => (
+                          <Cell
+                            key={entry.name}
+                            fill={
+                              index === 0
+                                ? "#22c55e" // highest: green
+                                : index === chartData.length - 1
+                                ? "#ef4444" // lowest: red
+                                : "#8b5cf6" // everyone else: violet
+                            }
+                          />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            )}
+
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mt-6">
               <h2 className="font-bold text-slate-900 mb-4">Users</h2>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
