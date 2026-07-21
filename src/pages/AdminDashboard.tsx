@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Navbar from "../components/Navbar"
+import StarRating from "../components/StarRating"
 import { API_URL } from "../config"
+
 interface PlatformStats {
   total_users: number
   total_items: number
@@ -12,7 +14,6 @@ interface PlatformStats {
   transactions_active: number
   returns_on_time: number
   returns_late: number
-  
 }
 
 interface AdminUser {
@@ -31,7 +32,7 @@ interface AdminTransaction {
   returned_at: string | null
   item_title: string
   borrower_name: string
-  return_note: string| null
+  return_note: string | null
 }
 
 const txStyles: Record<string, string> = {
@@ -60,12 +61,13 @@ function AdminDashboard() {
     async function fetchAll() {
       try {
         const [statsRes, usersRes, txRes] = await Promise.all([
-           fetch(`${API_URL}/admin/stats`, { headers, cache: "no-store" }),
-           fetch(`${API_URL}/admin/users`, { headers, cache: "no-store" }),
-           fetch(`${API_URL}/admin/transactions`, { headers, cache: "no-store" }),
+          fetch(`${API_URL}/admin/stats`, { headers, cache: "no-store" }),
+          fetch(`${API_URL}/admin/users`, { headers, cache: "no-store" }),
+          fetch(`${API_URL}/admin/transactions`, { headers, cache: "no-store" }),
         ])
 
-      if (statsRes.status === 403 || usersRes.status === 403 || txRes.status === 403) {          setForbidden(true)
+        if (statsRes.status === 403 || usersRes.status === 403 || txRes.status === 403) {
+          setForbidden(true)
           return
         }
 
@@ -152,8 +154,8 @@ function AdminDashboard() {
                       <th className="pb-2 pr-4 font-medium">Name</th>
                       <th className="pb-2 pr-4 font-medium">Email</th>
                       <th className="pb-2 pr-4 font-medium">Role</th>
-                      <th className="pb-2 font-medium">Trust score</th>
-                      
+                      <th className="pb-2 pr-4 font-medium">Trust score</th>
+                      <th className="pb-2 font-medium">Rating</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -172,7 +174,10 @@ function AdminDashboard() {
                             {u.role}
                           </span>
                         </td>
-                        <td className="py-2.5 font-semibold text-violet-800">{u.trust_score}</td>
+                        <td className="py-2.5 pr-4 font-semibold text-violet-800">{u.trust_score}</td>
+                        <td className="py-2.5">
+                          <StarRating score={u.trust_score} size="sm" />
+                        </td>
                       </tr>
                     ))}
                   </tbody>

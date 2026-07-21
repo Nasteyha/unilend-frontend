@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Navbar from "../components/Navbar"
+import StarRating from "../components/StarRating"
+import StarRatingInput from "../components/StarRatingInput"
 import { API_URL } from "../config"
 
 interface ReceivedRequest {
@@ -20,6 +22,7 @@ function ReceivedRequests() {
   const navigate = useNavigate()
   const [requests, setRequests] = useState<ReceivedRequest[]>([])
   const [notes, setNotes] = useState<Record<string, string>>({})
+  const [ratings, setRatings] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(true)
 
   async function fetchRequests() {
@@ -67,7 +70,10 @@ function ReceivedRequests() {
           },
           body:
             action === "return"
-              ? JSON.stringify({ return_note: notes[requestId] || null })
+              ? JSON.stringify({
+                  return_note: notes[requestId] || null,
+                  lender_rating: ratings[requestId] || null,
+                })
               : undefined,
         }
       )
@@ -112,12 +118,10 @@ function ReceivedRequests() {
                         <p className="text-sm text-slate-600 mt-1">
                           Requested by <span className="font-medium">{r.borrower_name}</span>
                         </p>
-                        <p className="text-sm text-slate-500 mt-1">
-                          Trust score:{" "}
-                          <span className="font-semibold text-violet-900">
-                            {r.borrower_trust_score}
-                          </span>
-                        </p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-sm text-slate-500">Trust score:</span>
+                          <StarRating score={r.borrower_trust_score} size="sm" />
+                        </div>
                         {r.return_deadline && (
                           <p className="text-sm text-slate-500 mt-1">
                             Proposed return: {new Date(r.return_deadline).toLocaleDateString()}
@@ -181,6 +185,13 @@ function ReceivedRequests() {
                         )}
                       </div>
                       <div className="flex flex-col gap-2 shrink-0 w-full sm:w-56">
+                        <div>
+                          <p className="text-xs text-slate-500 mb-1">Rate this borrower</p>
+                          <StarRatingInput
+                            value={ratings[r.id] || null}
+                            onChange={(rating) => setRatings({ ...ratings, [r.id]: rating })}
+                          />
+                        </div>
                         <input
                           type="text"
                           value={notes[r.id] || ""}

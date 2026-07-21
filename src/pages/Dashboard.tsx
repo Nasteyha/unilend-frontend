@@ -12,7 +12,9 @@ import {
   LabelList,
 } from "recharts"
 import Navbar from "../components/Navbar"
+import StarRating from "../components/StarRating"
 import { API_URL } from "../config"
+
 interface User {
   id: string
   full_name: string
@@ -123,6 +125,7 @@ function Dashboard() {
   const statCards = stats
     ? [
         {
+          key: "items_listed",
           label: "Items listed",
           value: stats.items_listed,
           accent: "text-violet-700",
@@ -134,6 +137,7 @@ function Dashboard() {
           ),
         },
         {
+          key: "currently_borrowed",
           label: "Currently borrowed",
           value: stats.items_currently_borrowed,
           accent: "text-violet-700",
@@ -145,6 +149,7 @@ function Dashboard() {
           ),
         },
         {
+          key: "pending_requests",
           label: "Pending requests",
           value: stats.requests_received_pending,
           accent: "text-violet-700",
@@ -156,6 +161,7 @@ function Dashboard() {
           ),
         },
         {
+          key: "trust_score",
           label: "Trust score",
           value: stats.trust_score,
           accent: "text-amber-600",
@@ -207,6 +213,11 @@ function Dashboard() {
                     {card.value}
                   </p>
                   <p className="text-sm text-slate-500 mt-1">{card.label}</p>
+                  {card.key === "trust_score" && (
+                    <div className="mt-2">
+                      <StarRating score={stats.trust_score} size="sm" showValue={false} />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
