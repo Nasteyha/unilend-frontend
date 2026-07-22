@@ -1,11 +1,15 @@
 import { useState, type FormEvent } from "react"
 import { useNavigate, Link } from "react-router-dom"
+import { User, Mail, Lock, Eye, EyeOff, ShieldCheck, Sparkles, GraduationCap } from "lucide-react"
 import { API_URL } from "../config"
+import AuthShowcase from "../components/AuthShowcase"
+
 function Register() {
   const [fullName, setFullName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
 
   async function handleRegister(e: FormEvent) {
@@ -36,65 +40,149 @@ function Register() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-amber-100 via-violet-100 to-white px-6 relative overflow-hidden">
-      <div className="absolute -top-40 -right-40 w-[32rem] h-[32rem] bg-violet-500 rounded-full blur-3xl opacity-25" />
-      <div className="absolute -bottom-40 -left-40 w-[28rem] h-[28rem] bg-amber-400 rounded-full blur-3xl opacity-25" />
+    <div className="relative overflow-hidden min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-violet-50 to-white px-6 py-16">
 
-      <form
-        onSubmit={handleRegister}
-        className="relative w-full max-w-sm bg-white rounded-2xl border border-slate-200 shadow-lg p-8"
-      >
-        <div className="inline-flex items-center gap-2 text-xs font-semibold text-violet-900 bg-violet-50 border border-violet-200 rounded-full px-3 py-1 mb-5">
-          <span className="w-2 h-2 bg-violet-700 rounded-full animate-pulse" />
-          Verified USIU-A students only
+      {/* floating gradient glows */}
+      <div className="absolute -top-40 -right-40 w-[32rem] h-[32rem] bg-violet-500 rounded-full blur-3xl opacity-20 animate-pulse" style={{ animationDuration: "6s" }} />
+      <div className="absolute -bottom-40 -left-40 w-[28rem] h-[28rem] bg-amber-400 rounded-full blur-3xl opacity-20 animate-pulse" style={{ animationDuration: "8s" }} />
+      <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-indigo-300 rounded-full blur-3xl opacity-10" />
+
+      <div className="relative w-full max-w-5xl auth-grid gap-12 items-center">
+
+        {/* SIDE PANEL */}
+        <div className="auth-side-panel">
+          <AuthShowcase />
         </div>
 
-        <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 mb-1">Create your account</h1>
-        <p className="text-sm text-slate-500 mb-6">Join the UniLend campus community</p>
+        {/* CARD */}
+        <div className="relative w-full max-w-md mx-auto">
 
-        <label className="block text-sm font-medium text-slate-700 mb-1">Full name</label>
-        <input
-          type="text"
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-          placeholder="Your full name"
-          className="w-full border border-slate-300 rounded-xl px-4 py-2.5 mb-4 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent"
-        />
+          {/* subtle gradient ring behind the card for a floating effect */}
+          <div className="absolute -inset-0.5 bg-gradient-to-br from-violet-400/40 via-amber-300/30 to-violet-500/40 rounded-[2rem] blur-lg opacity-60" />
 
-        <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@usiu.ac.ke"
-          className="w-full border border-slate-300 rounded-xl px-4 py-2.5 mb-4 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent"
-        />
+          <form
+            onSubmit={handleRegister}
+            className="relative bg-white/70 backdrop-blur-2xl border border-white/60 rounded-[2rem] shadow-[0_8px_40px_rgba(109,40,217,0.15)] p-8 sm:p-10 overflow-hidden"
+          >
+            {/* glass sheen overlay */}
+            <div className="pointer-events-none absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white/50 via-transparent to-transparent" />
 
-        <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Choose a password"
-          className="w-full border border-slate-300 rounded-xl px-4 py-2.5 mb-4 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent"
-        />
+            <div className="relative">
+              {/* badge — only on small screens, since the side panel carries it above lg */}
+              <div className="auth-mobile-badge items-center gap-2 text-xs font-semibold text-violet-900 bg-violet-50/80 border border-violet-200 rounded-full px-3 py-1 mb-6">
+                <Sparkles className="w-3.5 h-3.5" />
+                Verified USIU-A students only
+              </div>
 
-        {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
+              {/* heading */}
+              <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
+                Create your account
+              </h1>
+              <p className="text-sm text-slate-600 mt-1.5 mb-8">
+                Join the UniLend campus community
+              </p>
 
-        <button
-          type="submit"
-          className="w-full bg-violet-900 text-white font-semibold rounded-full py-3 shadow-lg hover:bg-violet-950 transition"
-        >
-          Create account
-        </button>
+              {/* full name */}
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                Full name
+              </label>
+              <div className="relative mb-5">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400" />
+                <input
+                  type="text"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="Your full name"
+                  className="w-full border border-slate-200 rounded-2xl pl-11 pr-4 py-3 bg-white/80 text-slate-900 placeholder:text-slate-400 transition-all duration-300 hover:border-violet-300 focus:outline-none focus:ring-4 focus:ring-violet-500/15 focus:border-violet-400"
+                />
+              </div>
 
-        <p className="text-sm text-slate-500 mt-5 text-center">
-          Already have an account?{" "}
-          <Link to="/login" className="font-semibold text-violet-900 hover:underline">
-            Sign in
-          </Link>
-        </p>
-      </form>
+              {/* email */}
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                Email
+              </label>
+              <div className="relative mb-5">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@usiu.ac.ke"
+                  className="w-full border border-slate-200 rounded-2xl pl-11 pr-4 py-3 bg-white/80 text-slate-900 placeholder:text-slate-400 transition-all duration-300 hover:border-violet-300 focus:outline-none focus:ring-4 focus:ring-violet-500/15 focus:border-violet-400"
+                />
+              </div>
+
+              {/* password */}
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                Password
+              </label>
+              <div className="relative mb-5">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Choose a password"
+                  className="w-full border border-slate-200 rounded-2xl pl-11 pr-11 py-3 bg-white/80 text-slate-900 placeholder:text-slate-400 transition-all duration-300 hover:border-violet-300 focus:outline-none focus:ring-4 focus:ring-violet-500/15 focus:border-violet-400"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-violet-600 transition-colors"
+                  tabIndex={-1}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
+                </button>
+              </div>
+
+              {/* error */}
+              {error && (
+                <div className="mb-5 text-sm text-red-600 bg-red-50/90 border border-red-200 rounded-2xl px-4 py-2.5">
+                  {error}
+                </div>
+              )}
+
+              {/* button with animated shine */}
+              <button
+                type="submit"
+                className="group relative w-full overflow-hidden bg-gradient-to-r from-violet-700 to-violet-900 text-white font-semibold rounded-2xl py-3.5 shadow-lg shadow-violet-900/25 transition-all duration-300 hover:shadow-xl hover:shadow-violet-900/40 hover:-translate-y-0.5 active:translate-y-0"
+              >
+                <span className="relative z-10">Create account</span>
+                <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out bg-gradient-to-r from-transparent via-white/25 to-transparent skew-x-12" />
+              </button>
+
+              {/* footer link */}
+              <p className="text-sm text-slate-600 mt-6 text-center">
+                Already have an account?{" "}
+                <Link
+                  to="/login"
+                  className="font-semibold text-violet-900 hover:text-violet-700 transition-colors"
+                >
+                  Sign in
+                </Link>
+              </p>
+
+              {/* trust indicators */}
+              <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mt-7 pt-6 border-t border-slate-200/70">
+                <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                  <GraduationCap className="w-3.5 h-3.5 text-violet-500" />
+                  Verified campus community
+                </div>
+                <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                  <ShieldCheck className="w-3.5 h-3.5 text-violet-500" />
+                  Secure authentication
+                </div>
+                <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                  <Lock className="w-3.5 h-3.5 text-violet-500" />
+                  Encrypted passwords
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+      </div>
     </div>
   )
 }

@@ -8,3 +8,12 @@
   .nav-desktop { display: none !important; }
   .nav-mobile-toggle { display: block !important; }
 }
+@media (min-width: 1024px) {
+  .auth-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; }
+  .auth-side-panel { display: block !important; }
+  .auth-mobile-badge { display: none !important; }
+}
+@media (max-width: 1023.98px) {
+  .auth-side-panel { display: none !important; }
+  .auth-mobile-badge { display: inline-flex !important; }
+}

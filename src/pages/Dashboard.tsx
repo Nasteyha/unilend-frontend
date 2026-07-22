@@ -7,10 +7,10 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  CartesianGrid,
   Cell,
   LabelList,
 } from "recharts"
+import { Package, ArrowLeftRight, Clock, TrendingUp, Activity } from "lucide-react"
 import Navbar from "../components/Navbar"
 import StarRating from "../components/StarRating"
 import { API_URL } from "../config"
@@ -37,28 +37,34 @@ const BAR_GRADIENTS = [
   { id: "gradDeep", from: "#8b5cf6", to: "#6d28d9" },
 ]
 
-const CHART_LEGEND = [
-  {
-    color: "bg-amber-400",
-    label: "Items listed",
-    desc: "Everything you've put up for others to borrow",
-  },
-  {
-    color: "bg-violet-300",
-    label: "Requests sent",
-    desc: "Items you've asked to borrow from other students",
-  },
-  {
-    color: "bg-violet-500",
-    label: "Pending",
-    desc: "Requests on your items waiting for your decision",
-  },
-  {
-    color: "bg-violet-800",
-    label: "Approved",
-    desc: "Your requests that lenders have accepted",
-  },
-]
+// same thresholds enforced on the backend: low=0, medium=50, high=70
+function getTrustLevel(score: number) {
+  if (score >= 70) {
+    return {
+      label: "Power Lender",
+      next: null,
+      nextLabel: null,
+      floor: 70,
+      ceiling: 100,
+    }
+  }
+  if (score >= 50) {
+    return {
+      label: "Trusted Member",
+      next: 70,
+      nextLabel: "Power Lender",
+      floor: 50,
+      ceiling: 70,
+    }
+  }
+  return {
+    label: "Building Trust",
+    next: 50,
+    nextLabel: "Trusted Member",
+    floor: 0,
+    ceiling: 50,
+  }
+}
 
 function Dashboard() {
   const navigate = useNavigate()
@@ -115,12 +121,14 @@ function Dashboard() {
 
   const chartData = stats
     ? [
-        { name: "Items listed", value: stats.items_listed },
-        { name: "Requests sent", value: stats.requests_sent },
+        { name: "Listed", value: stats.items_listed },
+        { name: "Sent", value: stats.requests_sent },
         { name: "Pending", value: stats.requests_received_pending },
         { name: "Approved", value: stats.requests_approved },
       ]
     : []
+
+  const totalActivity = chartData.reduce((sum, d) => sum + d.value, 0)
 
   const statCards = stats
     ? [
@@ -130,11 +138,7 @@ function Dashboard() {
           value: stats.items_listed,
           accent: "text-violet-700",
           chip: "bg-violet-100 text-violet-700",
-          icon: (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-            </svg>
-          ),
+          icon: <Package className="w-4.5 h-4.5" />,
         },
         {
           key: "currently_borrowed",
@@ -142,11 +146,7 @@ function Dashboard() {
           value: stats.items_currently_borrowed,
           accent: "text-violet-700",
           chip: "bg-purple-100 text-purple-700",
-          icon: (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4M16 17H4m0 0l4 4m-4-4l4-4" />
-            </svg>
-          ),
+          icon: <ArrowLeftRight className="w-4.5 h-4.5" />,
         },
         {
           key: "pending_requests",
@@ -154,33 +154,26 @@ function Dashboard() {
           value: stats.requests_received_pending,
           accent: "text-violet-700",
           chip: "bg-indigo-100 text-indigo-700",
-          icon: (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          ),
-        },
-        {
-          key: "trust_score",
-          label: "Trust score",
-          value: stats.trust_score,
-          accent: "text-amber-600",
-          chip: "bg-amber-100 text-amber-700",
-          icon: (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
-          ),
+          icon: <Clock className="w-4.5 h-4.5" />,
         },
       ]
     : []
 
+  const trustLevel = stats ? getTrustLevel(stats.trust_score) : null
+  const progressPercent =
+    trustLevel && trustLevel.next
+      ? Math.min(100, ((stats!.trust_score - trustLevel.floor) / (trustLevel.ceiling - trustLevel.floor)) * 100)
+      : 100
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-violet-50 to-white">
+    <div className="relative min-h-screen bg-gradient-to-b from-amber-50 via-violet-50 to-white overflow-hidden">
+      <div className="absolute -top-32 -right-32 w-96 h-96 bg-violet-300 rounded-full blur-3xl opacity-20 pointer-events-none" />
+      <div className="absolute top-96 -left-32 w-80 h-80 bg-amber-300 rounded-full blur-3xl opacity-20 pointer-events-none" />
+
       <Navbar />
 
-      <main className="max-w-4xl mx-auto px-6 py-10">
-        <h2 className="text-3xl font-extrabold text-slate-900 mb-1">
+      <main className="relative max-w-6xl mx-auto px-6 py-6">
+        <h2 className="text-2xl font-extrabold text-slate-900 mb-0.5">
           {user ? (
             <>
               Welcome,{" "}
@@ -192,118 +185,179 @@ function Dashboard() {
             "Loading..."
           )}
         </h2>
-        <p className="text-slate-500">
-          {user ? `Signed in as ${user.email}` : ""}
-        </p>
+        <p className="text-sm text-slate-500">{user ? `Signed in as ${user.email}` : ""}</p>
 
-        {stats && (
+        {!stats ? (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-5">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white/60 rounded-xl border border-slate-200 h-20 animate-pulse" />
+            ))}
+          </div>
+        ) : (
           <>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8">
+            {/* STAT CARDS — compact row */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-5">
               {statCards.map((card) => (
                 <div
-                  key={card.label}
-                  className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:shadow-md hover:-translate-y-0.5 transition"
+                  key={card.key}
+                  className="group flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-xl border border-slate-200/80 shadow-sm px-4 py-3 transition-all duration-300 hover:shadow-md hover:border-violet-200"
                 >
-                  <div
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center mb-3 ${card.chip}`}
-                  >
+                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110 ${card.chip}`}>
                     {card.icon}
                   </div>
-                  <p className={`text-3xl font-extrabold ${card.accent}`}>
-                    {card.value}
-                  </p>
-                  <p className="text-sm text-slate-500 mt-1">{card.label}</p>
-                  {card.key === "trust_score" && (
-                    <div className="mt-2">
-                      <StarRating score={stats.trust_score} size="sm" showValue={false} />
-                    </div>
-                  )}
+                  <div className="min-w-0">
+                    <p className={`text-xl font-extrabold leading-tight ${card.accent}`}>{card.value}</p>
+                    <p className="text-xs text-slate-500 truncate">{card.label}</p>
+                  </div>
                 </div>
               ))}
             </div>
 
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mt-6">
-              <h3 className="font-bold text-slate-900">Activity overview</h3>
-              <p className="text-sm text-slate-500 mb-5">
-                Your lending activity at a glance
-              </p>
+            {/* MAIN ROW: chart + trust card side by side */}
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mt-4">
+              {/* ACTIVITY CHART — takes more width */}
+              <div className="lg:col-span-3 relative bg-white rounded-2xl border border-slate-200 shadow-md shadow-violet-900/5 p-5 overflow-hidden">
+                <div className="pointer-events-none absolute -top-16 -right-16 w-48 h-48 bg-violet-200 rounded-full blur-3xl opacity-25" />
+                <div className="relative">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-violet-800 flex items-center justify-center shadow-sm">
+                        <Activity className="w-4 h-4 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-sm text-slate-900 leading-tight">Activity overview</h3>
+                        <p className="text-xs text-slate-500">Your lending activity</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xl font-extrabold bg-gradient-to-r from-amber-500 to-violet-700 bg-clip-text text-transparent leading-tight">
+                        {totalActivity}
+                      </p>
+                      <p className="text-[11px] text-slate-400">total</p>
+                    </div>
+                  </div>
 
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={chartData} barSize={52}>
-                    <defs>
-                      {BAR_GRADIENTS.map((g) => (
-                        <linearGradient
-                          key={g.id}
-                          id={g.id}
-                          x1="0"
-                          y1="0"
-                          x2="0"
-                          y2="1"
-                        >
-                          <stop offset="0%" stopColor={g.from} />
-                          <stop offset="100%" stopColor={g.to} />
-                        </linearGradient>
-                      ))}
-                    </defs>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      vertical={false}
-                      stroke="#e2e8f0"
-                    />
-                    <XAxis
-                      dataKey="name"
-                      tick={{ fontSize: 12, fill: "#64748b" }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <YAxis
-                      allowDecimals={false}
-                      tick={{ fontSize: 12, fill: "#64748b" }}
-                      axisLine={false}
-                      tickLine={false}
-                      width={28}
-                    />
-                    <Tooltip
-                      cursor={{ fill: "rgba(124, 58, 237, 0.06)" }}
-                      contentStyle={{
-                        borderRadius: "12px",
-                        border: "1px solid #e2e8f0",
-                        fontSize: "13px",
-                        boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
-                      }}
-                    />
-                    <Bar dataKey="value" radius={[10, 10, 0, 0]}>
-                      <LabelList
-                        dataKey="value"
-                        position="top"
-                        style={{ fill: "#334155", fontSize: 13, fontWeight: 700 }}
-                      />
-                      {chartData.map((entry, index) => (
-                        <Cell
-                          key={entry.name}
-                          fill={`url(#${BAR_GRADIENTS[index].id})`}
+                  <div className="h-48">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={chartData} barSize={44}>
+                        <defs>
+                          {BAR_GRADIENTS.map((g) => (
+                            <linearGradient key={g.id} id={g.id} x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor={g.from} />
+                              <stop offset="100%" stopColor={g.to} />
+                            </linearGradient>
+                          ))}
+                        </defs>
+                        <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#64748b" }} axisLine={false} tickLine={false} />
+                        <YAxis hide />
+                        <Tooltip
+                          cursor={{ fill: "rgba(124, 58, 237, 0.06)" }}
+                          contentStyle={{ borderRadius: "10px", border: "1px solid #e2e8f0", fontSize: "12px" }}
                         />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+                        <Bar dataKey="value" radius={[8, 8, 0, 0]} animationDuration={700}>
+                          <LabelList dataKey="value" position="top" style={{ fill: "#1e293b", fontSize: 12, fontWeight: 700 }} />
+                          {chartData.map((entry, index) => (
+                            <Cell key={entry.name} fill={`url(#${BAR_GRADIENTS[index].id})`} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  {/* compact single-line legend */}
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 pt-2 border-t border-slate-100">
+                    <span className="flex items-center gap-1.5 text-[11px] text-slate-500"><span className="w-2 h-2 rounded-full bg-amber-400" />Listed</span>
+                    <span className="flex items-center gap-1.5 text-[11px] text-slate-500"><span className="w-2 h-2 rounded-full bg-violet-300" />Sent</span>
+                    <span className="flex items-center gap-1.5 text-[11px] text-slate-500"><span className="w-2 h-2 rounded-full bg-violet-500" />Pending</span>
+                    <span className="flex items-center gap-1.5 text-[11px] text-slate-500"><span className="w-2 h-2 rounded-full bg-violet-800" />Approved</span>
+                  </div>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6 pt-5 border-t border-slate-100">
-                {CHART_LEGEND.map((item) => (
-                  <div key={item.label} className="flex items-start gap-3">
-                    <span
-                      className={`w-3 h-3 rounded-full mt-1 shrink-0 ${item.color}`}
-                    />
-                    <p className="text-sm text-slate-600">
-                      <span className="font-semibold text-slate-800">
-                        {item.label}
-                      </span>{" "}
-                      — {item.desc}
-                    </p>
+              {/* TRUST REPUTATION CARD */}
+              {trustLevel && (
+                <div className="lg:col-span-2 relative bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/80 shadow-sm p-5 overflow-hidden">
+                  <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/40 via-transparent to-transparent" />
+                  <div className="relative">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          <TrendingUp className="w-3.5 h-3.5 text-amber-500" />
+                          <span className="text-[11px] font-semibold uppercase tracking-wide text-amber-600">
+                            {trustLevel.label}
+                          </span>
+                        </div>
+                        <p className="text-2xl font-extrabold text-slate-900 leading-tight">
+                          {stats.trust_score}
+                          <span className="text-sm font-medium text-slate-400"> / 100</span>
+                        </p>
+                      </div>
+                      <StarRating score={stats.trust_score} size="sm" showValue={false} />
+                    </div>
+
+                    {trustLevel.next && (
+                      <div className="mt-3">
+                        <div className="flex justify-between text-[11px] text-slate-500 mb-1">
+                          <span>{trustLevel.label}</span>
+                          <span>{trustLevel.nextLabel} · {trustLevel.next}</span>
+                        </div>
+                        <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-gradient-to-r from-amber-400 to-violet-600 transition-all duration-700 ease-out"
+                            style={{ width: `${progressPercent}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* tier breakdown — fills the space with real, useful info */}
+                    <div className="grid grid-cols-3 gap-1.5 mt-3 pt-3 border-t border-slate-100">
+                      {[
+                        { name: "Low risk", threshold: 0 },
+                        { name: "Medium", threshold: 50 },
+                        { name: "High risk", threshold: 70 },
+                      ].map((tier) => {
+                        const unlocked = stats.trust_score >= tier.threshold
+                        return (
+                          <div
+                            key={tier.name}
+                            className={`rounded-lg px-2 py-1.5 text-center ${
+                              unlocked ? "bg-violet-50" : "bg-slate-50"
+                            }`}
+                          >
+                            <p className={`text-[10px] font-semibold ${unlocked ? "text-violet-700" : "text-slate-400"}`}>
+                              {tier.name}
+                            </p>
+                            <p className={`text-[10px] mt-0.5 ${unlocked ? "text-violet-500" : "text-slate-400"}`}>
+                              {unlocked ? "Unlocked" : `Needs ${tier.threshold}`}
+                            </p>
+                          </div>
+                        )
+                      })}
+                    </div>
                   </div>
-                ))}
+                </div>
+              )}
+            </div>
+
+            {/* SECONDARY ROW: activity snapshot chips */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/80 shadow-sm px-5 py-4 mt-4">
+              <div className="flex items-center justify-between mb-2.5">
+                <h3 className="font-bold text-sm text-slate-900">Your activity snapshot</h3>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <span className="text-xs font-medium bg-violet-50 text-violet-700 rounded-full px-3 py-1">
+                  {stats.items_listed} listed
+                </span>
+                <span className="text-xs font-medium bg-amber-50 text-amber-700 rounded-full px-3 py-1">
+                  {stats.requests_approved} approved
+                </span>
+                <span className="text-xs font-medium bg-indigo-50 text-indigo-700 rounded-full px-3 py-1">
+                  {stats.requests_sent} sent
+                </span>
+                <span className="text-xs font-medium bg-purple-50 text-purple-700 rounded-full px-3 py-1">
+                  {stats.items_currently_borrowed} on loan
+                </span>
               </div>
             </div>
           </>
